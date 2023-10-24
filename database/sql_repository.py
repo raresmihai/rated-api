@@ -12,7 +12,7 @@ class SqlRepository(IRepository):
 
     This class provides methods for creating and retrieving ProcessedTransaction objects in a SQL database.
     """
-    
+
     def create(self, transaction: ProcessedTransaction) -> None:
         with get_db_session() as session:
             try:
@@ -43,12 +43,12 @@ class SqlRepository(IRepository):
             """)
             result = session.execute(sql).fetchone()
 
-            total_transactions_in_db = result[0] if result else 0
-            total_gas_used = result[1] if result else 0
-            total_gas_cost_in_dollars = result[2] if result else 0.0
+            total_transactions_in_db = result[0] if result and result[0] is not None else 0
+            total_gas_used = result[1] if result and result[1] is not None else 0
+            total_gas_cost_in_dollars = result[2] if result and result[2] is not None else 0.
 
             return {
                 "totalTransactionsInDB": total_transactions_in_db,
                 "totalGasUsed": total_gas_used,
-                "totalGasCostInDollars": round(total_gas_cost_in_dollars, 2)
+                "totalGasCostInDollars": total_gas_cost_in_dollars
             }
