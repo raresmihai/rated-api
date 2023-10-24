@@ -80,6 +80,10 @@ gas_cost_gwei = gas_cost_wei / 1e9
 
 Below is a list of some tasks and improvements that would be necessary for a production-like environment:
 
+### Async
+
+The present codebase operates in a blocking manner, without leveraging Python's asynchronous features. In a production setting, beyond integrating a message broker, we would also implement our service methods and API endpoints to function asynchronously.
+
 ### Validation and Error Handling
 
 - Some minimal model validation is already implemented using pydantic. For a production environment, we would:
