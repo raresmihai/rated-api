@@ -1,8 +1,13 @@
 from sqlalchemy import Column, String, Float, Integer, DateTime
 from sqlalchemy.ext.declarative import declarative_base
-from database.database import Base
+
+from .database import Base
 
 class ProcessedTransaction(Base):
+    """
+    A SQLAlchemy model representing a processed transaction.
+    """
+
     __tablename__ = "processed_transaction"
 
     hash = Column(String, primary_key=True, unique=True, index=True)
@@ -12,14 +17,3 @@ class ProcessedTransaction(Base):
     executedAt = Column(DateTime)
     gasUsed = Column(Integer)
     gasCostInDollars = Column(Float)
-
-    def __repr__(self):
-        return (
-            f"ProcessedTransaction(hash='{self.hash}', "
-            f"fromAddress='{self.fromAddress}', "
-            f"toAddress='{self.toAddress}', "
-            f"blockNumber={self.blockNumber}, "
-            f"executedAt={self.executedAt}, "
-            f"gasUsed={self.gasUsed}, "
-            f"gasCostInDollars={self.gasCostInDollars})"
-        )

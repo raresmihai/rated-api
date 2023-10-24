@@ -1,8 +1,13 @@
-from pydantic import BaseModel, validator
-from typing import Optional
 from datetime import datetime
+from typing import Optional
+
+from pydantic import BaseModel, validator
 
 class RawTransaction(BaseModel):
+    """
+    Represents a raw cryptocurrency transaction as per the csv file contents.
+    """
+
     hash: str
     nonce: int
     block_hash: str

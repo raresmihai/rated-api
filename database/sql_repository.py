@@ -1,12 +1,18 @@
 from typing import Optional, Dict, Any
-from .irepository import IRepository
-from database.database import get_db_session
-from models.processed_transaction import ProcessedTransaction
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy import text
 
-class SqlRepository(IRepository):
+from .irepository import IRepository
+from .database import get_db_session
+from .processed_transaction import ProcessedTransaction
 
+class SqlRepository(IRepository):
+    """
+    A repository class for handling database operations related to ProcessedTransaction objects.
+
+    This class provides methods for creating and retrieving ProcessedTransaction objects in a SQL database.
+    """
+    
     def create(self, transaction: ProcessedTransaction) -> None:
         with get_db_session() as session:
             try:

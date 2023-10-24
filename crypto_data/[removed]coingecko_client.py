@@ -4,7 +4,18 @@ from typing import Tuple
 from requests.exceptions import HTTPError
 from time import sleep
 
+"""
+This was the initial CoinGeckoClient that I implemented.
+It calls the  API to only get the last price and timestamp before the transaction time.
 
+While it is simpler and more readable than the one with a cache, it is also inefficient.
+The reason for this is that for old transaction timestamp the api granularity is 1 hour or 1 day (for 90+ days).
+Given the block length is 12 seconds, it means that in an hour we'll have 300 transactions mapping to the same aprox timestamp,
+and in a day we'll have 7200, resulting in too many redundant API calls.
+
+It's better to call the API for a longer period of time, store the timestamps in a database/cache, and use it when getting the approximate price.
+This is what CoinGeckoClientWithCache implements. 
+"""
 class CoinGeckoClient:
     
     BASE_URL = "https://api.coingecko.com/api/v3"

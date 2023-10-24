@@ -1,11 +1,39 @@
 from datetime import datetime
 
 class CryptoToUsd:
+    """
+    A utility class for converting cryptocurrency values to USD using a cache and an external client.
+
+    Args:
+        client: An external client for fetching cryptocurrency conversion rates.
+        eth_to_usd_cache: A cache dictionary for storing Ethereum to USD conversion rates.
+
+    Methods:
+        get(crypto: str, timestamp: datetime) -> float:
+            Get the value of a cryptocurrency in USD at a specific timestamp.
+
+    Raises:
+        ValueError: If the provided cryptocurrency is not supported.
+    """
+
     def __init__(self, client, eth_to_usd_cache):
         self.client = client
         self.eth_to_usd_cache = eth_to_usd_cache
 
-    def get_crypto_to_usd(self, crypto: str, timestamp: datetime) -> float:
+    def get(self, crypto: str, timestamp: datetime) -> float:
+        """
+        Get the value of a cryptocurrency in USD at a specific timestamp.
+
+        Args:
+            crypto (str): The cryptocurrency to convert (e.g., 'ethereum').
+            timestamp (datetime): The timestamp at which to fetch the conversion rate.
+
+        Returns:
+            float: The value of the cryptocurrency in USD at the specified timestamp.
+
+        Raises:
+            ValueError: If the provided cryptocurrency is not supported.
+        """        
         if crypto != 'ethereum':
             raise ValueError(f"Cryptocurrency {crypto} not supported")
 

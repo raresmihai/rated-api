@@ -4,7 +4,6 @@ from typing import Tuple
 from requests.exceptions import HTTPError
 from time import sleep
 import bisect
-from collections import OrderedDict
 
 class CoinGeckoClientWithCache:
     """
@@ -16,6 +15,9 @@ class CoinGeckoClientWithCache:
     
     In lack of a database, a local in-memory cache is used that gets built on the fly,
     as more (timestamp, price) pairs are retrieved from CoinGecko API calls.
+
+    The approximate price returned for a transaction will be the last known price before the transaction timestamp.
+    Which depending on the transaction age can be up to 5 minutes, 1 hour or 1 day before.
 
     The primary purpose of using a local cache is to minimize API calls to
     CoinGecko and improve the efficiency of data retrieval.
@@ -37,9 +39,13 @@ class CoinGeckoClientWithCache:
     def get(self, crypto: str, timestamp: datetime) -> float:
 
         pos = bisect.bisect_left(self.sorted_timestamps, timestamp)
-        
-        # If the timestamp or a lower one is found in cache
-        if pos > 0:
+
+        # If the exact timestamp is found in cache
+        if pos < len(self.sorted_timestamps) and self.sorted_timestamps[pos] == timestamp:
+            return self.cache[timestamp]
+
+        # If a lower timestamp is found in cache
+        elif pos > 0:
             return self.cache[self.sorted_timestamps[pos-1]]
         
         # If not found in cache, fetch data from CoinGecko
@@ -54,8 +60,10 @@ class CoinGeckoClientWithCache:
             
         # Try retrieving the value again from cache after update
         pos = bisect.bisect_left(self.sorted_timestamps, timestamp)
-        if pos > 0:
-            return self.cache[self.sorted_timestamps[pos-1]]
+        if pos < len(self.sorted_timestamps) and self.sorted_timestamps[pos] == timestamp:
+            return self.cache[timestamp]
+        elif pos > 0:
+            return self.cache[self.sorted_timestamps[pos-1]]        
         
         return None  # If value is still not found after the update 
 

@@ -1,18 +1,36 @@
 from pydantic import ValidationError
-import csv
 from datetime import datetime
-from models.raw_transaction import RawTransaction
-from models.processed_transaction import ProcessedTransaction
-from database.irepository import IRepository
+import csv
+
+from .raw_transaction import RawTransaction
+from database import ProcessedTransaction, IRepository
 from crypto_data.crypto_to_usd import CryptoToUsd
 
 class CsvProcessor:
+    """
+    A CSV processor class for handling cryptocurrency transaction data.
 
+    Args:
+        crypto_to_usd_instance (CryptoToUsd): An instance of CryptoToUsd for currency conversion.
+        db_repository (IRepository): A database repository for storing processed transactions.
+
+    Methods:
+        process(file_path: str):
+            Process a CSV file containing cryptocurrency transaction data.
+        csv_stream(filename: str):
+            Generate rows from a CSV file.
+        process_raw_transaction(transaction: RawTransaction) -> ProcessedTransaction:
+            Process a raw cryptocurrency transaction into a processed transaction.
+        compute_gas_cost_in_usd(transaction: RawTransaction) -> float:
+            Compute the gas cost of a transaction in USD.
+
+    """
+    
     def __init__(self, crypto_to_usd_instance: CryptoToUsd, db_repository: IRepository):
         self.crypto_to_usd_instance = crypto_to_usd_instance
         self.db_repository = db_repository
 
-    def process_csv_stream(self, file_path: str):
+    def process(self, file_path: str):
         print(f"[CsvProcessor] Processing {file_path}")
         for transaction_event in self.csv_stream(file_path):
             try:
@@ -54,7 +72,7 @@ class CsvProcessor:
         gas_cost_wei = transaction.receipts_gas_used * transaction.receipts_effective_gas_price
         gas_cost_gwei = gas_cost_wei / 1e9
         gas_cost_eth = gas_cost_gwei / 1e9
-        eth_to_usd = self.crypto_to_usd_instance.get_crypto_to_usd('ethereum', transaction.block_timestamp)
+        eth_to_usd = self.crypto_to_usd_instance.get('ethereum', transaction.block_timestamp)
         gas_cost_usd = gas_cost_eth * eth_to_usd
 
         return gas_cost_usd

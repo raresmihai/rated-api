@@ -1,12 +1,16 @@
 from sqlalchemy import create_engine, inspect, Column, String, Integer, Float, DateTime, MetaData
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import declarative_base, sessionmaker
 from sqlalchemy.exc import InvalidRequestError
 from contextlib import contextmanager
 
-#DATABASE_URL = "postgresql://postgres:user@password:5432/rated"
+"""
+Database configuration
+"""
 
-# Using SQLite in-memory database
+
+# Using SQLite in-memory database. Saving contents to ratedapi.db
+# In a production environment we'd use an actual DB (e.g. Postgresql, MySql etc)
+    # DATABASE_URL = "postgresql://postgres:user@password:5432/rated"
 DATABASE_URL = "sqlite:///ratedapi.db"
 
 engine = create_engine(DATABASE_URL)
@@ -36,3 +40,5 @@ def table_exists(table_name: str) -> bool:
 def init_db():
     if not table_exists("processed_transaction"):
         Base.metadata.create_all(bind=engine)
+
+__all__ = ['Base', 'init_db', 'get_db_session']

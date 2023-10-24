@@ -2,8 +2,14 @@ import pickle
 
 from typing import Optional
 from database.irepository import IRepository
-from models.processed_transaction import ProcessedTransaction
+from .processed_transaction import ProcessedTransaction
 
+"""
+NOT USED.
+
+InMemoryRepository that I initially used when building the solution for testing purposes.
+Could be used for testing purposes.
+"""
 class InMemoryRepository(IRepository):
     def __init__(self):
         self._data_source = {}

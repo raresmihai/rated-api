@@ -1,33 +1,29 @@
-from fastapi import FastAPI, HTTPException
-from database.sql_repository import SqlRepository
-from server.dto.processed_transaction_response import ProcessedTransactionResponse
-from server.dto.stats_response import StatsResponse
+import argparse
+import uvicorn
+from fastapi import FastAPI
+from database import init_db, SqlRepository
+from server.routes import get_api_router
+from crypto_data import CoinGeckoClientWithCache, CryptoToUsd
+from data_processor import CsvProcessor
 
 app = FastAPI()
+
 repository = SqlRepository()
 
-@app.get("/transactions/{hash}", response_model=ProcessedTransactionResponse)
-def get_transaction(hash: str):
-    transaction = repository.get_by_hash(hash)
-    if transaction is None:
-        raise HTTPException(status_code=404, detail="Transaction not found")
-    return ProcessedTransactionResponse(
-        hash=transaction.hash,
-        fromAddress=transaction.fromAddress,
-        toAddress=transaction.toAddress,
-        blockNumber=transaction.blockNumber,
-        executedAt=transaction.executedAt,
-        gasUsed=transaction.gasUsed,
-        gasCostInDollars=transaction.gasCostInDollars,
-    )
-
-@app.get("/stats", response_model=StatsResponse)
-def get_stats():
-    stats = repository.get_stats()
-    return stats
+app.include_router(get_api_router(repository))
 
 if __name__ == "__main__":
-    from database import database
-    database.init_db()
-    import uvicorn
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--process_csv', dest='process_csv', action='store_true', 
+        help="Process the CSV file and populate the database before starting the server")
+    args = parser.parse_args()
+
+    init_db()
+
+    if args.process_csv:
+        coin_gecko_client = CoinGeckoClientWithCache()
+        crypto_to_usd = CryptoToUsd(client=coin_gecko_client, eth_to_usd_cache={})
+        csv_processor = CsvProcessor(crypto_to_usd_instance=crypto_to_usd, db_repository=repository)        
+        csv_processor.process(file_path="ethereum_txs.csv")
+
     uvicorn.run(app, host="0.0.0.0", port=8000)
