@@ -9,7 +9,7 @@
 ### 2. Set Up a Virtual Environment
 ```bash
 cd rated-api
-python -m venv venv  
+python3 -m venv venv  
 source venv/bin/activate
 pip install -r requirements.txt
 ```
@@ -88,9 +88,10 @@ Below is a list of some tasks and improvements that would be necessary for a pro
     - It's essential to catch different exceptions that might arise, log them, emit relevant metrics, and implement alerts.
     - Additional unit tests, especially for database and server packages, are required.
 
-### Authentication
+### Security
 
-- At present, the APIs are public. In a production-like environment:
+- At present, the APIs are public and served over http. In a production-like environment:
+    - We'd implement TLS so we communicate over https only.
     - We'd implement an authentication mechanism, potentially through API keys or tokens.
     - It would be advisable to implement a rate limiter, akin to the one used by the Coingecko API.
 
