@@ -1,10 +1,9 @@
 from sqlalchemy import Column, String, Float, Integer, DateTime
 from sqlalchemy.ext.declarative import declarative_base
-
-Base = declarative_base()
+from database.database import Base
 
 class ProcessedTransaction(Base):
-    __tablename__ = "processed_transactions"
+    __tablename__ = "processed_transaction"
 
     hash = Column(String, primary_key=True, unique=True, index=True)
     fromAddress = Column(String)

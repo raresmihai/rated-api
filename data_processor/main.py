@@ -3,21 +3,25 @@ from crypto_data.coingecko_client_cached import CoinGeckoClientWithCache
 from crypto_data.crypto_to_usd import CryptoToUsd
 from data_processor.csv_processor import CsvProcessor
 from database.in_memory_repository import InMemoryRepository
-# from database.sql_repository import SqlRepository
+from database.sql_repository import SqlRepository
+from models.processed_transaction import ProcessedTransaction 
+from database import database
+
+database.init_db()
 
 # Instantiate the required components
 coin_gecko_client = CoinGeckoClient()
 coin_gecko_client_cached = CoinGeckoClientWithCache()
 
 crypto_to_usd = CryptoToUsd(client=coin_gecko_client_cached, eth_to_usd_cache={})
-repository = InMemoryRepository()
+#repository = InMemoryRepository()
 # repository.load('processed_transactions.pk1')
-# repository = SqlRepository()
+repository = SqlRepository()
 csv_processor = CsvProcessor(crypto_to_usd_instance=crypto_to_usd, db_repository=repository)
 
 # # Process the CSV file
 csv_processor.process_csv_stream(file_path="ethereum_txs.csv")
-repository.save('processed_transactions.pk1')
+#repository.save('processed_transactions.pk1')
 
 # Print the details of transactions with the given hashes
 transaction_hashes = [
